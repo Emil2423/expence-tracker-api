@@ -1,0 +1,43 @@
+# Django Personal Finance / Budget Tracker
+# Requirements file for production deployment
+
+# Django Framework
+Django>=5.0,<6.0
+
+# Django REST Framework
+djangorestframework>=3.14.0,<4.0
+
+# JWT Authentication
+djangorestframework-simplejwt>=5.3.0,<6.0
+
+# Filtering
+django-filter>=23.5,<24.0
+
+# CORS Headers
+django-cors-headers>=4.3.0,<5.0
+
+# Environment variables (for production)
+python-decouple>=3.8,<4.0
+
+# Database (PostgreSQL for production)
+psycopg2-binary>=2.9.9,<3.0
+
+# WSGI Server (for production)
+gunicorn>=21.2.0,<22.0
+
+# Static files for production
+whitenoise>=6.6.0,<7.0
+
+# Development and Testing
+pytest>=7.4.0,<8.0
+pytest-django>=4.7.0,<5.0
+pytest-cov>=4.1.0,<5.0
+factory-boy>=3.3.0,<4.0
+
+# Code Quality
+black>=23.12.0,<24.0
+flake8>=6.1.0,<7.0
+isort>=5.13.0,<6.0
+
+# Security
+django-ratelimit>=4.1.0,<5.0

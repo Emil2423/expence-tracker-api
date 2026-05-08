@@ -1,38 +1,26 @@
-"""
-Serializers for budget management.
-"""
-
 from decimal import Decimal
-
 from django.db.models import Sum
 from rest_framework import serializers
-
 from transactions.models import Category, Transaction
-
 from .models import Budget
-
-
 class BudgetSerializer(serializers.ModelSerializer):
-    """
-    Serializer for Budget model.
-    
-    Handles CRUD operations for budgets with validation.
-    """
-
     category_name = serializers.CharField(
         source='category.name',
         read_only=True,
     )
+
     category_type = serializers.CharField(
         source='category.type',
         read_only=True,
     )
+
     spent = serializers.SerializerMethodField()
     remaining = serializers.SerializerMethodField()
     progress_percentage = serializers.SerializerMethodField()
 
     class Meta:
         model = Budget
+
         fields = [
             'id',
             'category',
@@ -47,6 +35,7 @@ class BudgetSerializer(serializers.ModelSerializer):
             'progress_percentage',
             'created_at',
         ]
+
         read_only_fields = [
             'id',
             'created_at',
@@ -58,7 +47,7 @@ class BudgetSerializer(serializers.ModelSerializer):
         ]
 
     def get_spent(self, obj):
-        """Calculate total spent in the budget period."""
+
         spent = (
             Transaction.objects
             .filter(
@@ -71,31 +60,27 @@ class BudgetSerializer(serializers.ModelSerializer):
             or Decimal('0')
         )
         return spent
-
+    
     def get_remaining(self, obj):
-        """Calculate remaining budget."""
         spent = self.get_spent(obj)
         remaining = obj.amount - spent
         return max(remaining, Decimal('0'))
-
+    
     def get_progress_percentage(self, obj):
-        """Calculate percentage of budget spent."""
         spent = self.get_spent(obj)
         if obj.amount > 0:
             percentage = (spent / obj.amount) * 100
             return min(round(percentage, 2), 100)
         return 0
-
+    
     def validate_amount(self, value):
-        """Validate amount is positive."""
         if value <= Decimal('0'):
             raise serializers.ValidationError(
                 "Budget amount must be greater than zero."
             )
         return value
-
+    
     def validate_category(self, value):
-        """Validate category belongs to user and is expense type."""
         user = self.context['request'].user
         if value.user != user:
             raise serializers.ValidationError(
@@ -106,30 +91,21 @@ class BudgetSerializer(serializers.ModelSerializer):
                 "Budgets can only be set for expense categories."
             )
         return value
-
+    
     def validate(self, attrs):
-        """Validate budget period dates."""
         start_date = attrs.get('start_date')
         end_date = attrs.get('end_date')
-        
         if start_date and end_date and start_date > end_date:
             raise serializers.ValidationError({
                 'end_date': 'End date must be after start date.'
             })
-        
         return attrs
-
+    
     def create(self, validated_data):
-        """Create budget with current user."""
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
-
-
+    
 class BudgetSummarySerializer(serializers.Serializer):
-    """
-    Serializer for overall budget summary.
-    """
-
     total_budgeted = serializers.DecimalField(max_digits=12, decimal_places=2)
     total_spent = serializers.DecimalField(max_digits=12, decimal_places=2)
     total_remaining = serializers.DecimalField(max_digits=12, decimal_places=2)

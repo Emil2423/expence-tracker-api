@@ -1,27 +1,12 @@
-"""
-Models for transaction and category management.
-"""
-
 from decimal import Decimal
-
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
-
-
 class Category(models.Model):
-    """
-    Category model for organizing transactions.
-    
-    Each user has their own set of categories.
-    Categories are either INCOME or EXPENSE type.
-    """
-
     TYPE_CHOICES = [
         ('INCOME', 'Income'),
         ('EXPENSE', 'Expense'),
     ]
-
     name = models.CharField(
         max_length=50,
         verbose_name='category name',
@@ -43,7 +28,6 @@ class Category(models.Model):
         auto_now_add=True,
         verbose_name='date created',
     )
-
     class Meta:
         verbose_name = 'category'
         verbose_name_plural = 'categories'
@@ -54,19 +38,9 @@ class Category(models.Model):
                 name='unique_category_per_user',
             )
         ]
-
     def __str__(self):
-        """Return string representation of category."""
         return f"{self.name} ({self.get_type_display()})"
-
-
 class Transaction(models.Model):
-    """
-    Transaction model for tracking income and expenses.
-    
-    Each transaction belongs to a user and is categorized.
-    """
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -100,7 +74,6 @@ class Transaction(models.Model):
         auto_now_add=True,
         verbose_name='date created',
     )
-
     class Meta:
         verbose_name = 'transaction'
         verbose_name_plural = 'transactions'
@@ -110,17 +83,11 @@ class Transaction(models.Model):
             models.Index(fields=['user', 'category']),
             models.Index(fields=['date']),
         ]
-
     def __str__(self):
-        """Return string representation of transaction."""
         return f"{self.category.name}: {self.amount} on {self.date.strftime('%Y-%m-%d')}"
-
     @property
     def is_income(self):
-        """Check if transaction is income."""
         return self.category.type == 'INCOME'
-
     @property
     def is_expense(self):
-        """Check if transaction is expense."""
         return self.category.type == 'EXPENSE'

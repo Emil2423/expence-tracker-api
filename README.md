@@ -37,10 +37,16 @@ finance_tracker/
 ### 1. Clone and Setup
 
 ```bash
-cd finance_tracker
+cd expence-tracker-api
+
+# Using venv (standard)
 python -m venv venv
 venv\Scripts\activate  # Windows
 # source venv/bin/activate  # Linux/Mac
+
+# OR Using Conda
+conda create -n expense-tracker python=3.12 -y
+conda activate expense-tracker
 
 pip install -r requirements.txt
 ```
